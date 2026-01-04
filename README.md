@@ -38,10 +38,6 @@ RUN wget -O /tmp/bitcoin-abc.tar.gz https://download.bitcoinabc.org/0.32.5/linux
 
 WORKDIR /data
 
-#RUN wget -O /data/p2pool_peers.txt https://xmrvsbeast.com/p2pool/sidechain_configs/mini_peerlist/p2pool_peers.txt
-#EXPOSE 13333 37888
-#CMD [ "/usr/local/bin/p2pool", "--host", "127.0.0.1", "--rpc-port", "18081", "--zmq-port", "18083", "--wallet", "47LEKYMMBw97XEmuCbnm2z1qFg6MFXXqBGL2QJNtKTQZYmqvQ7uBpf22Qzu4UifrHpbL5Nbhkvs5nGgJFn1Tz4jL8Fispw4", "--stratum", "0.0.0.0:13333", "--p2p", "0.0.0.0:37888", "--mini", "--log-file", "/data/p2pool.log" ]
-
 EXPOSE 8339 9009
 CMD [ "/usr/bin/bitcoind", "-conf=/data/bitcoin.conf", "-datadir=/data" ]
 ```
@@ -61,3 +57,39 @@ sudo docker build -t [your_docker_hub_name]/[image_name]:latest .
 ```bash
 sudo docker push [your_docker_hub_name]/[image_name]:latest
 ```
+
+#### Test
+```bash
+sudo docker run [your_docker_hub_name]/[image_name]
+```
+You should see the node and synchronization starts.
+
+## Prepare configuration
+The default configuration is `bitcoin.conf`, you should modify the `rpcauth`. 
+- Download the file: `rpcauth.py`
+```bash
+wget https://raw.githubusercontent.com/Bitcoin-ABC/bitcoin-abc/refs/heads/master/share/rpcauth/rpcauth.py
+chmod +x rpcauth.py
+```
+- Create RPC credential:
+```bash
+./rpcauth.py testuser userpasss
+String to be appended to bitcoin.conf:
+rpcauth=testuser:bccbb2753658aaa7d92c8c74177a312a$add6a36cabd0ff49cd240b64319f21539bd64d65ea73fdc2fb74de0414fbd841
+Your password:
+userpasss
+```
+- Copy the `rpcauth....` to the `bitcoin.conf` 
+- Modify the ports if you need to.
+- Create folder `/data/bitcoin-abc/data` if it doesn't exist
+- Copy `bitcoin.conf` to `data/bitcoin-abc/data` folder
+
+
+## Add to existing docker-compose
+
+Copy the content of the docker-compose.yml to the existing docker-compose.yml. You can name the node as you like.
+Then start up the service along with the existing services (in this sample, the new server is `bitcoin-abc`).
+```bash
+sudo docker compose up bitcoin-abc
+```
+
