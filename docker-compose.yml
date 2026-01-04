@@ -1,0 +1,10 @@
+services:
+  bitcoin-abc-node:
+    image: zithiat/bitcoin-abc:latest
+    container_name: bitcoin-abc
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /data/bitcoin-abc/data:/data
+    environment:
+      - TZ=America/Detroit
